@@ -1,3 +1,14 @@
+/**
+ * @type {Object}
+ * @property {number} timeout - Connection timeout in milliseconds
+ * @property {number} port - Port number for TLS connection
+ * @property {boolean} rejectUnauthorized - Whether to reject invalid certificates
+ * @property {boolean} enableTrace - Enable connection tracing
+ * @property {number} concurrency - Maximum number of simultaneous connections
+ * @property {number} dnsTimeout - DNS resolution timeout in milliseconds
+ * @property {number} retries - Number of retry attempts for failed connections
+ * @property {number} retryDelay - Delay between retries in milliseconds
+ */
 const DEFAULT_OPTIONS = {
     timeout: 1000,
     port: 443,
@@ -9,6 +20,10 @@ const DEFAULT_OPTIONS = {
     retryDelay: 100
 };
 
+/**
+ * @param {Object} options - Configuration options to validate
+ * @throws {Error} If any option is invalid
+ */
 function validateOptions(options) {
     if (typeof options.timeout !== 'number' || options.timeout <= 0) {
         throw new Error('Timeout must be a positive number');

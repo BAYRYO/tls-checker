@@ -1,8 +1,22 @@
+/**
+ * Formats and structures TLS check results
+ */
 class ResultFormatter {
+    /**
+     * Creates a new ResultFormatter instance
+     * @param {Object} options - Configuration options for the formatter
+     */
     constructor(options) {
         this.options = options;
     }
 
+    /**
+     * Formats successful TLS connection results
+     * @param {string} hostname - The hostname that was checked
+     * @param {string} ip - The IP address that was connected to
+     * @param {import('node:tls').TLSSocket} socket - The TLS socket connection
+     * @returns {Object} Formatted success result containing TLS and certificate details
+     */
     formatSuccess(hostname, ip, socket) {
         const cert = socket.getPeerCertificate(true);
         return {
@@ -24,12 +38,24 @@ class ResultFormatter {
         };
     }
 
+    /**
+     * Parses certificate alternative names into an array
+     * @param {string} altNames - Comma-separated string of alternative names
+     * @returns {string[]} Array of parsed alternative names
+     * @private
+     */
     parseAltNames(altNames) {
         if (!altNames) return [];
         return altNames.split(', ')
             .map(name => name.startsWith('DNS:') ? name.slice(4) : name);
     }
 
+    /**
+     * Formats a successful host check result
+     * @param {string} hostname - The hostname that was checked
+     * @param {Object} data - The TLS check result data
+     * @returns {Object} Formatted host result with success status
+     */
     formatHostResult(hostname, data) {
         return {
             hostname,
@@ -38,6 +64,12 @@ class ResultFormatter {
         };
     }
 
+    /**
+     * Formats an error result for a host check
+     * @param {string} hostname - The hostname that failed checking
+     * @param {Error} error - The error that occurred
+     * @returns {Object} Formatted host result with error status and details
+     */
     formatHostError(hostname, error) {
         return {
             hostname,
@@ -47,6 +79,11 @@ class ResultFormatter {
         };
     }
 
+    /**
+     * Formats final results for multiple host checks
+     * @param {Object[]} results - Array of individual host check results
+     * @returns {Object} Consolidated results with summary statistics
+     */
     formatFinalResults(results) {
         return {
             summary: {

@@ -3,7 +3,14 @@ const DNSResolver = require('./DNSResolver');
 const { validateOptions, DEFAULT_OPTIONS } = require('./config');
 const ResultFormatter = require('./ResultFormatter');
 
+/**
+ * TLSChecker class for performing TLS certificate validation on hostnames
+ */
 class TLSChecker {
+    /**
+     * Creates a new TLSChecker instance
+     * @param {Object} options - Configuration options for the checker
+     */
     constructor(options = {}) {
         this.options = { ...DEFAULT_OPTIONS, ...options };
         validateOptions(this.options);
@@ -13,6 +20,11 @@ class TLSChecker {
         this.resultFormatter = new ResultFormatter(this.options);
     }
 
+    /**
+     * Checks TLS certificate for a single hostname
+     * @param {string} hostname - The hostname to check
+     * @returns {Promise<Object>} Formatted result of the TLS check
+     */
     async checkTLS(hostname) {
         return this.retryOperation(async () => {
             const ip = await this.dnsResolver.resolve(hostname);
@@ -26,6 +38,12 @@ class TLSChecker {
         });
     }
 
+    /**
+     * Checks TLS certificates for multiple hostnames
+     * @param {string[]} hostnames - Array of hostnames to check
+     * @returns {Promise<Object>} Consolidated results for all hostnames
+     * @throws {Error} If hostnames parameter is not an array
+     */
     async checkMultiple(hostnames) {
         if (!Array.isArray(hostnames)) {
             throw new Error('Hostnames must be an array');
@@ -35,6 +53,12 @@ class TLSChecker {
         return this.resultFormatter.formatFinalResults(results);
     }
 
+    /**
+     * Processes hostnames queue with concurrency control
+     * @param {string[]} hostnames - Array of hostnames to process
+     * @returns {Promise<Array>} Array of processed results
+     * @private
+     */
     async processQueue(hostnames) {
         const results = [];
         const queue = [...hostnames];
@@ -56,6 +80,13 @@ class TLSChecker {
         return results;
     }
 
+    /**
+     * Processes a single hostname and adds result to results array
+     * @param {string} hostname - Hostname to process
+     * @param {Array} results - Array to store results
+     * @returns {Promise<void>}
+     * @private
+     */
     async processHost(hostname, results) {
         try {
             const result = await this.checkTLS(hostname);
@@ -65,6 +96,13 @@ class TLSChecker {
         }
     }
 
+    /**
+     * Retries an operation with exponential backoff
+     * @param {Function} operation - Async function to retry
+     * @returns {Promise<*>} Result of the operation
+     * @throws {Error} Last error encountered after all retries
+     * @private
+     */
     async retryOperation(operation) {
         let lastError;
         let attempts = 0;
