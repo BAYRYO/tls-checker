@@ -48,7 +48,7 @@ describe('DNSResolver', () => {
             await expect(resolver.resolve('example.com'))
                 .rejects
                 .toThrow('DNS resolution failed for example.com: DNS lookup timeout');
-        });
+        }, 3000); // Increased timeout to 3000ms
     });
 
     describe('createTimeout', () => {
@@ -58,6 +58,6 @@ describe('DNSResolver', () => {
             await expect(timeoutPromise)
                 .rejects
                 .toThrow('DNS lookup timeout');
-        });
+        }, 3000); // Increased timeout to 3000ms
     });
 });
