@@ -20,7 +20,6 @@ async function main() {
          * @returns {Promise<Object>} Consolidated results for all hostnames
          */
         const results = await checker.checkMultiple([
-            'www.okantis.fr',
             'www.github.com',
             'www.nodejs.org',
             'www.npmjs.com'
