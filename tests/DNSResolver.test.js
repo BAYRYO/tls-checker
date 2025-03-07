@@ -1,35 +1,38 @@
-const dns = require('dns').promises;
-const DNSResolver = require('../src/DNSResolver');
-
+// First, set up the mock before any imports
+const mockResolve4 = jest.fn();
 jest.mock('dns', () => ({
     promises: {
-        resolve4: jest.fn()
+        resolve4: mockResolve4
     }
 }));
+
+// Then import the module under test
+const DNSResolver = require('../src/DNSResolver');
 
 describe('DNSResolver', () => {
     let resolver;
     const mockOptions = { dnsTimeout: 1000 };
 
     beforeEach(() => {
-        resolver = new DNSResolver(mockOptions);
+        // Reset all mocks and create new resolver instance
         jest.clearAllMocks();
+        resolver = new DNSResolver(mockOptions);
     });
 
     describe('resolve', () => {
         it('should successfully resolve a hostname', async () => {
             const mockAddress = ['1.2.3.4'];
-            dns.resolve4.mockResolvedValue(mockAddress);
+            mockResolve4.mockResolvedValueOnce(mockAddress);
 
             const result = await resolver.resolve('example.com');
 
             expect(result).toBe('1.2.3.4');
-            expect(dns.resolve4).toHaveBeenCalledWith('example.com');
+            expect(mockResolve4).toHaveBeenCalledWith('example.com');
         });
 
         it('should throw error when DNS resolution fails', async () => {
             const errorMessage = 'DNS error';
-            dns.resolve4.mockRejectedValue(new Error(errorMessage));
+            mockResolve4.mockRejectedValueOnce(new Error(errorMessage));
 
             await expect(resolver.resolve('example.com'))
                 .rejects
@@ -38,7 +41,7 @@ describe('DNSResolver', () => {
 
         it('should throw timeout error when DNS resolution takes too long', async () => {
             // Mock DNS resolution to take longer than timeout
-            dns.resolve4.mockImplementation(() => new Promise(resolve => 
+            mockResolve4.mockImplementationOnce(() => new Promise(resolve => 
                 setTimeout(() => resolve(['1.2.3.4']), 2000)
             ));
 

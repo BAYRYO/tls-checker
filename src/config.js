@@ -1,12 +1,12 @@
 const DEFAULT_OPTIONS = {
-    timeout: 5000,
+    timeout: 1000,
     port: 443,
     rejectUnauthorized: false,
     enableTrace: false,
-    concurrency: 5,
-    dnsTimeout: 3000,
-    retries: 2,
-    retryDelay: 1000
+    concurrency: 20,
+    dnsTimeout: 1000,
+    retries: 1,
+    retryDelay: 100
 };
 
 function validateOptions(options) {

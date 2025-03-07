@@ -67,18 +67,25 @@ class TLSChecker {
 
     async retryOperation(operation) {
         let lastError;
-        for (let i = 0; i <= this.options.retries; i++) {
+        let attempts = 0;
+        const maxAttempts = this.options.retries + 1; // Total attempts = retries + 1 initial try
+        
+        while (attempts < maxAttempts) {
             try {
                 return await operation();
             } catch (error) {
                 lastError = error;
-                if (i < this.options.retries) {
+                attempts++;
+                
+                // Only wait if we're going to make another attempt
+                if (attempts < maxAttempts) {
                     await new Promise(resolve => 
                         setTimeout(resolve, this.options.retryDelay)
                     );
                 }
             }
         }
+        
         throw lastError;
     }
 }
